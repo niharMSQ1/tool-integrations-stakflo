@@ -2133,7 +2133,7 @@ class EvidenceMasters(Base):
     expected_frequency: Mapped[Optional[str]] = mapped_column(String(50))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(precision=0))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(precision=0))
-    domain: Mapped[Optional[str]] = mapped_column(String)
+    # domain: Mapped[Optional[str]] = mapped_column(String)
     required_fields: Mapped[Optional[dict]] = mapped_column(JSON)
     integration_domain_evidence_sources_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
     # tool_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
