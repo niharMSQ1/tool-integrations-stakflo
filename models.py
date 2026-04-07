@@ -256,7 +256,6 @@ class IntegrationDomains(Base):
 
     integration_domain_evidence_sources: Mapped[list['IntegrationDomainEvidenceSources']] = relationship('IntegrationDomainEvidenceSources', back_populates='integration_domain')
     tools: Mapped[list['Tools']] = relationship('Tools', back_populates='domain')
-    evidence_masters: Mapped[list['EvidenceMasters']] = relationship('EvidenceMasters', back_populates='domain_')
 
 
 class IntegrationDomainEvidenceSources(Base):
@@ -277,6 +276,7 @@ class IntegrationDomainEvidenceSources(Base):
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(DateTime, server_default=text('now()'))
 
     integration_domain: Mapped['IntegrationDomains'] = relationship('IntegrationDomains', back_populates='integration_domain_evidence_sources')
+    evidence_masters: Mapped[list['EvidenceMasters']] = relationship('EvidenceMasters', back_populates='integration_domain_evidence_source')
 
 
 class FailedJobs(Base):
@@ -1711,7 +1711,6 @@ class Tools(Base):
 
     domain: Mapped[Optional['IntegrationDomains']] = relationship('IntegrationDomains', back_populates='tools')
     control_scenarios: Mapped[list['ControlScenarios']] = relationship('ControlScenarios', back_populates='tool')
-    evidence: Mapped[list['Evidence']] = relationship('Evidence', back_populates='tool')
     evidence_masters: Mapped[list['EvidenceMasters']] = relationship('EvidenceMasters', back_populates='tool')
     tool_evidence: Mapped[list['ToolEvidence']] = relationship('ToolEvidence', back_populates='tool')
     tool_integrations: Mapped[list['ToolIntegrations']] = relationship('ToolIntegrations', back_populates='tool')
@@ -2088,7 +2087,6 @@ class Evidence(Base):
     __table_args__ = (
         ForeignKeyConstraint(['organization_id'], ['organizations.id'], ondelete='CASCADE', name='evidence_organization_id_foreign'),
         ForeignKeyConstraint(['tool_evidence_id'], ['tool_evidence.id'], ondelete='SET NULL', name='evidence_tool_evidence_id_fkey'),
-        ForeignKeyConstraint(['tool_id'], ['tools.id'], ondelete='CASCADE', name='evidence_tool_id_foreign'),
         PrimaryKeyConstraint('id', name='evidence_pkey'),
         Index('evidence_tool_evidence_id_index', 'tool_evidence_id'),
         Index('evidence_title_index', 'title')
@@ -2101,13 +2099,11 @@ class Evidence(Base):
     description: Mapped[Optional[str]] = mapped_column(Text)
     due_date: Mapped[Optional[datetime.date]] = mapped_column(Date)
     status: Mapped[Optional[str]] = mapped_column(String(255))
-    tool_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
     tool_evidence_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(precision=0))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(precision=0))
 
     organization: Mapped['Organizations'] = relationship('Organizations', back_populates='evidence')
-    tool: Mapped[Optional['Tools']] = relationship('Tools', back_populates='evidence')
     tool_evidence: Mapped[Optional['ToolEvidence']] = relationship('ToolEvidence', back_populates='evidence')
     evidence_collection: Mapped[list['EvidenceCollection']] = relationship('EvidenceCollection', back_populates='evidence')
     evidence_collections: Mapped[list['EvidenceCollections']] = relationship('EvidenceCollections', back_populates='evidence')
@@ -2117,7 +2113,7 @@ class Evidence(Base):
 class EvidenceMasters(Base):
     __tablename__ = 'evidence_masters'
     __table_args__ = (
-        ForeignKeyConstraint(['domain_id'], ['integration_domains.id'], name='evidence_masters_domain_id_fkey'),
+        ForeignKeyConstraint(['integration_domain_evidence_sources_id'], ['integration_domain_evidence_sources.id'], name='evidence_masters_integration_domain_evidence_sources_id_fkey'),
         ForeignKeyConstraint(['policy_template_id'], ['policy_templates.id'], ondelete='SET NULL', name='fk_policy_template'),
         ForeignKeyConstraint(['tool_id'], ['tools.id'], ondelete='SET NULL', name='evidence_masters_tool_id_fkey'),
         PrimaryKeyConstraint('id', name='evidence_masters_pkey'),
@@ -2139,11 +2135,11 @@ class EvidenceMasters(Base):
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(precision=0))
     domain: Mapped[Optional[str]] = mapped_column(String)
     required_fields: Mapped[Optional[dict]] = mapped_column(JSON)
-    domain_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
+    integration_domain_evidence_sources_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
     # tool_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
     policy_template_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
 
-    domain_: Mapped[Optional['IntegrationDomains']] = relationship('IntegrationDomains', back_populates='evidence_masters')
+    integration_domain_evidence_source: Mapped[Optional['IntegrationDomainEvidenceSources']] = relationship('IntegrationDomainEvidenceSources', back_populates='evidence_masters')
     policy_template: Mapped[Optional['PolicyTemplates']] = relationship('PolicyTemplates', back_populates='evidence_masters')
     tool: Mapped[Optional['Tools']] = relationship('Tools', back_populates='evidence_masters')
     control_evidence_master: Mapped[list['ControlEvidenceMaster']] = relationship('ControlEvidenceMaster', back_populates='evidence_master')
