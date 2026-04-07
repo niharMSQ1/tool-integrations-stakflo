@@ -2097,7 +2097,6 @@ class EvidenceMasters(Base):
     is_required_evidence: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('true'))
     category: Mapped[Optional[str]] = mapped_column(String(100))
     source: Mapped[Optional[str]] = mapped_column(String(100))
-    description: Mapped[Optional[str]] = mapped_column(Text)
     expected_frequency: Mapped[Optional[str]] = mapped_column(String(50))
     created_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(precision=0))
     updated_at: Mapped[Optional[datetime.datetime]] = mapped_column(TIMESTAMP(precision=0))
