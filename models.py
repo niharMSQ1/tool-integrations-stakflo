@@ -1707,7 +1707,6 @@ class Tools(Base):
     permissions: Mapped[Optional[dict]] = mapped_column(JSON)
     resources: Mapped[Optional[dict]] = mapped_column(JSON)
     domain_id: Mapped[Optional[uuid.UUID]] = mapped_column(Uuid)
-    category: Mapped[Optional[str]] = mapped_column(String(255))
 
     domain: Mapped[Optional['IntegrationDomains']] = relationship('IntegrationDomains', back_populates='tools')
     control_scenarios: Mapped[list['ControlScenarios']] = relationship('ControlScenarios', back_populates='tool')
